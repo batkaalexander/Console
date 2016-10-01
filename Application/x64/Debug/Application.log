@@ -1,3 +1,7 @@
 ﻿  Application.cpp
-  Application.vcxproj -> D:\Tvorba soft systemov\Console application - tail\Application\x64\Debug\Application.exe
-  Application.vcxproj -> D:\Tvorba soft systemov\Console application - tail\Application\x64\Debug\Application.pdb (Full PDB)
+c:\users\alex\documents\githubvisualstudio\console\application\application.cpp(28): warning C4273: 'GetLastXChars': inconsistent dll linkage
+  c:\users\alex\documents\githubvisualstudio\console\library\library.h(19): note: see previous definition of 'GetLastXChars'
+c:\users\alex\documents\githubvisualstudio\console\application\application.cpp(56): warning C4273: 'GetLastXLines': inconsistent dll linkage
+  c:\users\alex\documents\githubvisualstudio\console\library\library.h(20): note: see previous definition of 'GetLastXLines'
+     Creating library C:\Users\Alex\Documents\GitHubVisualStudio\Console\Application\x64\Debug\Application.lib and object C:\Users\Alex\Documents\GitHubVisualStudio\Console\Application\x64\Debug\Application.exp
+  Application.vcxproj -> C:\Users\Alex\Documents\GitHubVisualStudio\Console\Application\x64\Debug\Application.exe

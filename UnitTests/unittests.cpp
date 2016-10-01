@@ -6,6 +6,11 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 #include "../Library/Library.h"
 
 #include <vector>
+#include "stdafx.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <fstream>
+#include <string>
 
 namespace UnitTests
 {		
@@ -59,6 +64,39 @@ namespace UnitTests
 
 			Assert::IsTrue(getopt((int)argv.size(), &argv[0], opts) == EOF, L"last option");
 			Assert::IsTrue(optind == 5, L"first param index");
+		}
+
+		TEST_METHOD(Test_Z)
+		{
+			optarg = nullptr;
+			optind = 0;
+
+			std::vector<char *> argv1 = { "Application.exe", "-c", "2", "-f", "C:\\Users\\Alex\\Documents\\GitHubVisualStudio\\Console\\Application\\ReadMe.txt" };
+			std::vector<char *> argv2 = { "Application.exe", "-n", "1", "-f", "C:\\Users\\Alex\\Documents\\GitHubVisualStudio\\Console\\Application\\ReadMe.txt" };
+			std::vector<char *> argv5 = { "Application.exe", "-n", "2", "asfshjhgkiuo\newqrwetrwrt weryertyer\niuopujmhhgbfdgdsg" };
+			char * opts = "c:n:f:";
+
+			std::string str(argv5[3]);
+			size_t pos = 0;
+			while ((pos = str.find("\\n", pos)) != std::string::npos)
+			{
+				str.replace(pos, 2, "\n");
+				pos += 2;
+			};
+			std::fstream file;
+			file.open(argv1[4], std::fstream::in);
+			Assert::AreEqual(GetLastXChars(file, atoi(argv1[2])), std::string("Pr"), L"option -c");
+			file.close();
+
+			std::istringstream tmp(str);
+			Assert::AreEqual(GetLastXChars(tmp, atoi(argv5[2])), std::string("to"), L"option -c");
+
+			file.open(argv1[4], std::fstream::in);
+			Assert::AreEqual(GetLastXLines(file, atoi(argv2[2])), std::string("agadfg gsdfgsdfgsfd!\n"), L"option -n");
+			file.close();
+
+			std::istringstream tmp1(str);
+			Assert::AreEqual(GetLastXLines(tmp1, atoi(argv5[2])), std::string("s fdhsdfg sdfgsdfg sdfg sd\ns fdgsdf gsdf gsewrwer\n"), L"option -n");
 		}
 	};
 }

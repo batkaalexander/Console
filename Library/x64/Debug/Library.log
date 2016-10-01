@@ -1,3 +1,7 @@
-﻿     Creating library D:\Tvorba soft systemov\Console application - tail\Application\x64\Debug\Library.lib and object D:\Tvorba soft systemov\Console application - tail\Application\x64\Debug\Library.exp
-  Library.vcxproj -> D:\Tvorba soft systemov\Console application - tail\Application\x64\Debug\Library.dll
-  Library.vcxproj -> D:\Tvorba soft systemov\Console application - tail\Application\x64\Debug\Library.pdb (Full PDB)
+﻿  Library.cpp
+  Generating Code...
+  Compiling...
+  XGetopt.cpp
+  Generating Code...
+     Creating library C:\Users\Alex\Documents\GitHubVisualStudio\Console\Application\x64\Debug\Library.lib and object C:\Users\Alex\Documents\GitHubVisualStudio\Console\Application\x64\Debug\Library.exp
+  Library.vcxproj -> C:\Users\Alex\Documents\GitHubVisualStudio\Console\Application\x64\Debug\Library.dll

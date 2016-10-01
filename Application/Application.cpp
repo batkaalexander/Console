@@ -21,55 +21,45 @@ void DisplayUsage(char * appPath)
 	std::cout << "\t-h - help" << std::endl;
 	std::cout << "\t-n \"Filename\" k - vypis k poslednych riadkov filu" << std::endl;
 	std::cout << "\t-c \"Filename\" k - vypis k poslednych charakterov filu" << std::endl;
+	std::cout << "\t-f \"Filename\" subor na otvorenie" << std::endl;
 }
 
-std::string GetLastXChars(char* filename, char* numberOf)
+std::string GetLastXChars(std::istream& input, int numberOf)
 {
-	std::string temp = numberOf;
-	std::stringstream convert(temp);
-	int number;
-	convert >> number;
-	std::vector<char> LastX;
-	std::ifstream infile(filename, std::ios::in);
-	char c = infile.get();
-	while (infile.good())
+	std::string LastX;
+	char c;
+	while (input.get(c))
 	{
-		if (LastX.size() < number)
+		if (LastX.size() < numberOf)
 		{
-			LastX.push_back(c);
+			LastX += c;
 		}
 		else
 		{
-			LastX.push_back(c);
+			LastX += c;
 			LastX.erase(LastX.begin());
 		}
-		c = infile.get();
 	}
-	if (LastX.size() == 0 && number != 0)
+	if (LastX.size() == 0 && numberOf != 0)
 	{
-		std::cout << "File " << filename << " nemohol byt otvoreny" << std::endl;
+		std::cout << "Zly vstup" << std::endl;
 		return "";
 	}
 	else
 	{
-		std::string returning(LastX.begin(), LastX.end());
-		return returning;
+		return LastX;
 	}
 
 }
 
-std::vector<std::string> GetLastXLines(char* filename, char* numberOf)
+std::string GetLastXLines(std::istream& input, int numberOf)
 {
-	std::string temp = numberOf;
-	std::stringstream convert(temp);
-	int number;
-	convert >> number;
-	std::vector<std::string> LastX;
-	std::ifstream infile(filename, std::ios::in);
 	std::string line;
-	while (std::getline(infile, line))
+	std::string vystup;
+	std::vector<std::string> LastX;
+	while (std::getline(input, line))
 	{
-		if (LastX.size() < number)
+		if (LastX.size() < numberOf)
 		{
 			LastX.push_back(line);
 		}
@@ -79,11 +69,19 @@ std::vector<std::string> GetLastXLines(char* filename, char* numberOf)
 			LastX.erase(LastX.begin());
 		}
 	}
-	if (LastX.size() == 0 && number != 0)
+	if (LastX.size() == 0 && numberOf != 0)
 	{
-		std::cout << "File " << filename << " nemohol byt otvoreny" << std::endl;
+		std::cout << "Zly vstup" << std::endl;
+		return "";
 	}
-	return LastX;
+	else
+	{
+		for each (std::string var in LastX)
+		{
+			vystup += var + "\n";
+		}
+	}
+	return vystup;
 
 }
 int main(int argc, char **argv)
@@ -96,31 +94,130 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		while ((c = getopt(argc, argv, "hn:c:")) != EOF)
+		while ((c = getopt(argc, argv, "hn:c:f:")) != EOF)
 		{
 			switch (c)
 			{
-			case 'h':
-				DisplayUsage(argv[0]);
-				break;
-			case 'c':
-				std::cout << GetLastXChars(optarg, argv[optind]) << std::endl;
-				break;
-			case 'n':
-				vec = GetLastXLines(optarg, argv[optind]);
-				for (int i = 0; i < vec.size(); i++)
+				case 'h':
 				{
-					std::cout << vec[i] << std::endl;
+					DisplayUsage(argv[0]);
+					break;
 				}
-				break;
-			case '?':
-				std::wcout << "Chybny parameter '" << argv[optind - 1] << "'" << std::endl;
-				DisplayUsage(argv[0]);
-				return -1;
-			default:
-				std::wcout << "Neznamy parameter '" << (char)c << "'" << std::endl;
-				DisplayUsage(argv[0]);
-				return -1;
+				case 'f':
+				{
+					std::fstream file(optarg, std::fstream::in);
+					if (file.is_open())
+					{
+						if (std::string(argv[optind - 2]) == "-c")
+						{
+							std::cout << GetLastXChars(file, atoi(argv[optind - 1]));
+							file.close();
+							break;
+						}
+						if (std::string(argv[optind - 2]) == "-n")
+						{
+							std::cout << GetLastXLines(file, atoi(argv[optind - 1]));
+							file.close();
+							break;
+						}
+						file.close();
+						break;
+					}
+					else
+					{
+						std::cout << "Subor nemohol by otvoreny" << std::endl;
+						std::cout << "Press any key to continue" << std::endl;
+						getchar();
+						return -1;
+					}
+					break;
+				}
+				case 'c':
+				{
+					if (argc == 3)
+					{
+						std::cout << GetLastXChars(std::cin, atoi(optarg));
+						break;
+					}
+
+					if (argc == 4 && "-f" != argv[3])
+					{
+						std::string str(argv[3]);
+						size_t pos = 0;
+						while ((pos = str.find("\\n", pos)) != std::string::npos)
+						{
+							str.replace(pos, 2, "\n");
+							pos += 2;
+						};
+						std::istringstream tmp(str);
+						std::cout << GetLastXChars(tmp, atoi(optarg)) << std::endl;
+						break;
+					}
+
+					std::fstream file(argv[optind + 1], std::fstream::in);
+					if (!file.is_open())
+					{
+						std::cout << "Chyba suboru" << std::endl;
+						std::cout << "Press any key to continue" << std::endl;
+						getchar();
+						return -1;
+					}
+					std::cout << GetLastXChars(file, atoi(optarg));
+					file.close();
+					std::cout << std::endl;
+					optind = optind + 2;
+					break;
+				}
+				case 'n':
+				{
+					if (argc == 3)
+					{
+						std::cout << GetLastXLines(std::cin, atoi(optarg));
+					}
+
+					if (argc == 4 && "-f" != argv[3])
+					{
+						std::string str(argv[3]);
+						size_t pos = 0;
+						while ((pos = str.find("\\n", pos)) != std::string::npos)
+						{
+							str.replace(pos, 2, "\n");
+							pos += 2;
+						};
+						std::istringstream tmp(str);
+						std::cout << GetLastXLines(tmp, atoi(optarg));
+						break;
+					}
+					std::fstream file(argv[optind + 1], std::fstream::in);
+					if (!file.is_open())
+					{
+						std::cout << "Chyba suboru" << std::endl;
+						std::cout << "Press any key to continue" << std::endl;
+						getchar();
+						return -1;
+					}
+					std::cout << GetLastXLines(file, atoi(optarg));
+					file.close();
+					std::cout << std::endl;
+					optind = optind + 2;
+					break;
+				}
+				case '?':
+				{
+					std::wcout << "Chybny parameter '" << argv[optind - 1] << "'" << std::endl;
+					DisplayUsage(argv[0]);
+					std::cout << "Press any key to continue" << std::endl;
+					getchar();
+					return -1;
+				}
+				default:
+				{
+					std::wcout << "Neznamy parameter '" << (char)c << "'" << std::endl;
+					DisplayUsage(argv[0]);
+					std::cout << "Press any key to continue" << std::endl;
+					getchar();
+					return -1;
+				}
 			}
 		}
 	}
